@@ -3,8 +3,8 @@ import { DateTime } from "luxon";
 import { parse, unparse } from "papaparse";
 
 // Set Ramadan dates
-const ramadanStart = "2023-03-23";
-const ramadanEnd = "2023-04-20";
+const ramadanStart = "2024-03-11";
+const ramadanEnd = "2024-04-09";
 const ramadanStartTs = DateTime.fromISO(ramadanStart).valueOf();
 const ramadanEndTs = DateTime.fromISO(ramadanEnd).valueOf();
 
