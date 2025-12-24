@@ -2,16 +2,18 @@ import { createReadStream, writeFileSync } from "fs";
 import { DateTime } from "luxon";
 import { parse, unparse } from "papaparse";
 
-// Set Ramadan dates
-const ramadanStart = "2024-03-11";
-const ramadanEnd = "2024-04-09";
+const filename = "input-2026.csv";
+
+// Set Ramadan dates for 2026
+const ramadanStart = "2026-02-18";
+const ramadanEnd = "2026-03-19";
 const ramadanStartTs = DateTime.fromISO(ramadanStart).valueOf();
 const ramadanEndTs = DateTime.fromISO(ramadanEnd).valueOf();
 
 async function main() {
   const rows: Array<string[]> = [];
   await new Promise((resolve) => {
-    parse(createReadStream("input.csv"), {
+    parse(createReadStream(filename), {
       step: (row) => {
         rows.push(row.data as string[]);
       },
@@ -57,12 +59,24 @@ async function main() {
       hijri_date: "",
     };
 
-    //  Skip rows
-    if (obj.d_date === "DATE" || !obj.d_date) continue;
+    //  Skip rows (check for empty, header, or whitespace-only dates)
+    if (obj.d_date === "DATE" || !obj.d_date?.trim()) continue;
 
-    // Date formatting
+    // Date formatting - handle both DD/MM/YYYY and M/D/YY formats
     const dateSplit = obj.d_date.split("/");
-    obj.d_date = `${dateSplit[2]}-${dateSplit[1]}-${dateSplit[0]}`;
+    if (dateSplit[2].length === 4) {
+      // DD/MM/YYYY format (e.g., 01/05/2026)
+      obj.d_date = `${dateSplit[2]}-${dateSplit[1].padStart(
+        2,
+        "0"
+      )}-${dateSplit[0].padStart(2, "0")}`;
+    } else {
+      // M/D/YY format (e.g., 5/3/26) - American format
+      const year = `20${dateSplit[2]}`;
+      const month = dateSplit[0].padStart(2, "0");
+      const day = dateSplit[1].padStart(2, "0");
+      obj.d_date = `${year}-${month}-${day}`;
+    }
 
     // Time formatting
     for (const [key, value] of Object.entries(obj)) {
@@ -123,7 +137,7 @@ async function main() {
   const outputString = unparse(days, {
     header: true,
   });
-  writeFileSync("output.csv", outputString);
+  writeFileSync(`output-${filename.split("-")[1]}`, outputString);
 
   console.log("Completed");
 }
