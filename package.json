@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node index.ts",
+    "upload": "ts-node upload-times-wali.ts"
   },
   "keywords": [],
   "author": "",
